@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../services/notification_service.dart';
+import '../notification_screen.dart';
 
 class DashboardTab extends StatelessWidget {
   const DashboardTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final NotificationService _notificationService = NotificationService();
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -21,8 +25,80 @@ class DashboardTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top greeting section
-                _buildGreetingSection(context),
+                // Top greeting section with notification badge
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildGreetingSection(context),
+                    Row(
+                      children: [
+                        // Notification badge
+                        StreamBuilder<int>(
+                          stream: _notificationService.getUnreadNotificationsCount(),
+                          builder: (context, snapshot) {
+                            final unreadCount = snapshot.data ?? 0;
+                            
+                            return Stack(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.notifications,
+                                    size: 28,
+                                    color: AppColors.darkPurple,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const NotificationScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                if (unreadCount > 0)
+                                  Positioned(
+                                    right: 8,
+                                    top: 8,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 16,
+                                        minHeight: 16,
+                                      ),
+                                      child: Text(
+                                        unreadCount > 9 ? '9+' : '$unreadCount',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundColor: AppColors.primary,
+                          child: Text(
+                            'JD', // User initials
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
                 
                 const SizedBox(height: 24),
                 
@@ -73,36 +149,20 @@ class DashboardTab extends StatelessWidget {
       greeting += 'Evening';
     }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              greeting,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: AppColors.darkPurple,
-              ),
-            ),
-            Text(
-              'John Doe', // Replace with actual user name
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: AppColors.darkPurple,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        Text(
+          greeting,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            color: AppColors.darkPurple,
+          ),
         ),
-        CircleAvatar(
-          radius: 24,
-          backgroundColor: AppColors.primary,
-          child: Text(
-            'JD', // User initials
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+        Text(
+          'John Doe', // Replace with actual user name
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+            color: AppColors.darkPurple,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],

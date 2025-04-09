@@ -13,8 +13,11 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
+  late AnimationController _animationController;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _scaleAnimation;
   int _currentPage = 0;
 
   final List<OnboardingPage> _pages = [
@@ -51,8 +54,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    
+    _slideAnimation = Tween<double>(begin: 30.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutQuint,
+      ),
+    );
+    
+    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOut,
+      ),
+    );
+    
+    _animationController.forward();
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -66,6 +95,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -101,6 +132,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onPageChanged: (index) {
                     setState(() {
                       _currentPage = index;
+                      _animationController.reset();
+                      _animationController.forward();
                     });
                   },
                   itemBuilder: (context, index) {
@@ -141,12 +174,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
                           ),
                           child: const Text(
                             'Get Started',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
@@ -168,12 +203,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
                           ),
                           child: const Text(
                             'Next',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
@@ -187,55 +224,82 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildPage(OnboardingPage page) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Lottie animation with white circular background
-          Container(
-            width: 300,
-            height: 300,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  spreadRadius: 2,
+    final size = MediaQuery.of(context).size;
+    
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Lottie animation with white circular background and animation effects
+              Transform.translate(
+                offset: Offset(0, _slideAnimation.value),
+                child: Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: Container(
+                    width: size.width * 0.85,
+                    height: size.width * 0.85,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(25),
+                    child: Lottie.asset(
+                      page.animationPath,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
-              ],
-            ),
-            padding: const EdgeInsets.all(5),
-            child: Lottie.asset(
-              page.animationPath,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(height: 40),
-          
-          // Title
-          Text(
-            page.title,
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Title with animation
+              Transform.translate(
+                offset: Offset(0, _slideAnimation.value * 0.7),
+                child: Opacity(
+                  opacity: _animationController.value,
+                  child: Text(
+                    page.title,
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          
-          // Description
-          Text(
-            page.description,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withOpacity(0.85),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Description with animation
+              Transform.translate(
+                offset: Offset(0, _slideAnimation.value * 0.5),
+                child: Opacity(
+                  opacity: _animationController.value,
+                  child: Text(
+                    page.description,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Colors.white.withOpacity(0.85),
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-            textAlign: TextAlign.center,
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

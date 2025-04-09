@@ -2,6 +2,104 @@
 
 A futuristic, student-friendly Flutter application designed to help students manage their academic journey effectively.
 
+## Models
+
+This app includes the following data models:
+
+### Calendar Event Model
+- Represents academic calendar events such as lectures, exams, assignments, holidays, etc.
+- Properties include:
+  - Title, description
+  - Start and end dates/times
+  - Location
+  - Event type (lecture, exam, assignment, holiday, etc.)
+  - Color
+  - Department and semester
+  - All-day flag
+
+### Assignment Model
+- Represents homework, projects, and other assignments
+- Properties include:
+  - Title, description
+  - Due date
+  - Total marks
+  - Subject ID
+  - Status (active/expired)
+  - File URL (for attachments)
+
+### Submission Model
+- Represents student submissions for assignments
+- Properties include:
+  - Assignment ID
+  - Student ID
+  - Submission date
+  - File URL
+  - Marks and feedback
+  - Status (submitted, graded, late)
+
+### Notification Model
+- Represents system notifications and reminders
+- Types include:
+  - Event notifications
+  - Assignment notifications
+  - Announcements
+  - Grade notifications
+  - Reminders
+  - System notifications
+- Properties include:
+  - Title, content
+  - Timestamp
+  - User ID
+  - Related item ID
+  - Read status
+
+### Subject Model
+- Represents academic subjects or courses
+- Properties include:
+  - Name, code
+  - Department and semester
+  - Credits
+  - Description
+  - Faculty ID
+
+### Resource Model
+- Represents study materials and resources for subjects
+- Properties include:
+  - Title, description
+  - Type (notes, paper, book, etc.)
+  - Subject ID
+  - File URL
+  - Tags
+
+### Grade Model
+- Represents student grades for subjects
+- Properties include:
+  - Student ID and Subject ID
+  - Internal and external marks
+  - Total marks and grade
+  - Grade points
+  - Academic year
+
+### Faculty Model
+- Represents teaching staff and professors
+- Properties include:
+  - Name, email
+  - Department
+  - Position (Professor, Assistant Professor, etc.)
+  - Office location and hours
+  - Phone number
+  - List of subjects taught
+
+### Student Model
+- Represents student information
+- Properties include:
+  - User ID (for authentication)
+  - Name, email
+  - Roll number
+  - Department and semester
+  - Contact information
+  - Academic information (CGPA, attendance, etc.)
+
 ## Features
 
 - **Splash Screen**: Engaging splash screen with Lottie animations.

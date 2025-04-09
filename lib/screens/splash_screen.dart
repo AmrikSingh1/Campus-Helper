@@ -16,26 +16,42 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 2000),
     );
 
     _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Curves.easeIn,
+        curve: const Interval(0.3, 1.0, curve: Curves.easeIn),
+      ),
+    );
+
+    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.8, curve: Curves.easeOutQuint),
+      ),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOutBack),
       ),
     );
 
     _animationController.forward();
 
     // Navigate to AuthWrapper after 2.5 seconds
-    Timer(const Duration(milliseconds: 2500), () {
+    Timer(const Duration(milliseconds: 2700), () {
       Navigator.of(context).pushReplacement(
         AppRoutes.createFadeRoute(const AuthWrapper(), 
           duration: const Duration(milliseconds: 800),
@@ -52,6 +68,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -62,27 +80,39 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Lottie Animation with white background
-                Container(
-                  width: 320,
-                  height: 320,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 1,
+                // Animated Lottie with size and slide effects
+                AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, _slideAnimation.value),
+                      child: Transform.scale(
+                        scale: _scaleAnimation.value,
+                        child: Container(
+                          width: size.width * 0.75,
+                          height: size.width * 0.75,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.12),
+                                blurRadius: 20,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(15),
+                          child: Lottie.asset(
+                            'assets/lottie/Start-Your-Campus-Journey.json',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(5),
-                  child: Lottie.asset(
-                    'assets/lottie/Start-Your-Campus-Journey.json',
-                    fit: BoxFit.contain,
-                  ),
+                    );
+                  },
                 ),
+                
                 const SizedBox(height: 40),
                 
                 // App Title - Fade In Animation
@@ -93,6 +123,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
+                      shadows: [
+                        Shadow(
+                          offset: const Offset(0, 2),
+                          blurRadius: 5,
+                          color: Colors.black.withOpacity(0.15),
+                        )
+                      ]
                     ),
                   ),
                 ),
@@ -106,6 +143,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     'Master Every Semester.',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: Colors.white.withOpacity(0.85),
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),

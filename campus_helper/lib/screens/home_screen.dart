@@ -5,6 +5,7 @@ import 'tabs/dashboard_tab.dart';
 import 'tabs/resources_tab.dart';
 import 'tabs/assignments_tab.dart';
 import 'tabs/profile_tab.dart';
+import 'calendar/calendar_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _tabs = [
     const DashboardTab(),
     const ResourcesTab(),
+    const CalendarScreen(),
     const AssignmentsTab(),
     const ProfileTab(),
   ];
@@ -72,6 +74,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icon(Icons.menu_book_outlined),
                 activeIcon: Icon(Icons.menu_book),
                 label: 'Resources',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_today_outlined),
+                activeIcon: Icon(Icons.calendar_today),
+                label: 'Calendar',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.assignment_outlined),
